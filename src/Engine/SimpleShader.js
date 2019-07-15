@@ -76,8 +76,9 @@ SimpleShader.prototype._loadAndCompileShader = function(filePath, shaderType) {
   // shaderText = document.getElementById(id);
   // shaderSource = shaderText.firstChild.textContent;
 
-  xmlReq = new XMLHttpRequest();
-  xmlReq.open('GET', filePath, false);
+  // xmlReq = new XMLHttpRequest();
+  xmlReq = createCORSRequest('GET', filePath, false);
+  // xmlReq.open('GET', filePath, false);
   try {
     xmlReq.send();
   } catch (error) {
