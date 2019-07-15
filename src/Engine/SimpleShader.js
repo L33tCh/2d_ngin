@@ -42,14 +42,53 @@ function SimpleShader(vertexShaderID, fragmentShaderID) {
 
 }
 
+function createCORSRequest(method, url, async = true) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+
+    // Check if the XMLHttpRequest object has a "withCredentials" property.
+    // "withCredentials" only exists on XMLHTTPRequest2 objects.
+    xhr.open(method, url, async);
+
+  } else if (typeof XDomainRequest != "undefined") {
+
+    // Otherwise, check if XDomainRequest.
+    // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+
+  } else {
+
+    // Otherwise, CORS is not supported by the browser.
+    xhr = null;
+
+  }
+  return xhr;
+}
+
 // Returns a complied shader from a shader in the dom.
 // The id is the id of the script in the html tag.
-SimpleShader.prototype._loadAndCompileShader = function(id, shaderType) {
+SimpleShader.prototype._loadAndCompileShader = function(filePath, shaderType) {
   var shaderText, shaderSource, compiledShader;
   var gl = gEngine.Core.getGL();
-  // Step A: Get the shader source from index.html
-  shaderText = document.getElementById(id);
-  shaderSource = shaderText.firstChild.textContent;
+
+  // // Step A: Get the shader source from index.html
+  // shaderText = document.getElementById(id);
+  // shaderSource = shaderText.firstChild.textContent;
+
+  xmlReq = new XMLHttpRequest();
+  xmlReq.open('GET', filePath, false);
+  try {
+    xmlReq.send();
+  } catch (error) {
+    alert("Failed to load shader: " + filePath);
+    return null;
+  }
+  shaderSource = xmlReq.responseText;
+  if (shaderSource === null) {
+    alert("WARNING: Loading of:" + filePath + "Failed!");
+  }
+
   // Step B: Create the shader based on the shader type: vertex or fragment
   compiledShader = gl.createShader(shaderType);
   // Step C: Compile the created shader

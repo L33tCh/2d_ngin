@@ -2,11 +2,14 @@ function MyGame(htmlCanvasID) {
   // The shader for drawing
   this.mShader = null;
   gEngine.Core.initializeWebGL(htmlCanvasID);
-  this.mShader = new SimpleShader("VertexShader", "FragmentShader");
+  this.mShader = new SimpleShader(
+    "src/GLSLShaders/SimpleVS.glsl", // Path to the VertexShader
+    "src/GLSLShaders/WhiteFS.glsl"); // Path to the FragmentShader
+
   // Step C1: Clear the canvas
   gEngine.Core.clearCanvas([0, 0.8, 0, 1]);
 
-// Step C2: Activate the proper shader
+  // Step C2: Activate the proper shader
   this.mShader.activateShader();
 
   // Step C3: Draw with the currently activated geometry and the activated shader
