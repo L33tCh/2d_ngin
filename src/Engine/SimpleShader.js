@@ -13,7 +13,7 @@ function SimpleShader(vertexShaderID, fragmentShaderID) {
   var vertexShader = this._loadAndCompileShader(vertexShaderID, gl.VERTEX_SHADER);
   var fragmentShader = this._loadAndCompileShader(fragmentShaderID,
     gl.FRAGMENT_SHADER);
-
+console.log({vertexShader, fragmentShader});
   // Step B: Create and link the shaders into a program.
   this.mCompiledShader = gl.createProgram();
   gl.attachShader(this.mCompiledShader, vertexShader);
@@ -42,67 +42,39 @@ function SimpleShader(vertexShaderID, fragmentShaderID) {
 
 }
 
-function createCORSRequest(method, url, async = true) {
-  var xhr = new XMLHttpRequest();
-  if ("withCredentials" in xhr) {
-
-    // Check if the XMLHttpRequest object has a "withCredentials" property.
-    // "withCredentials" only exists on XMLHTTPRequest2 objects.
-    xhr.open(method, url, async);
-
-  } else if (typeof XDomainRequest != "undefined") {
-
-    // Otherwise, check if XDomainRequest.
-    // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
-    xhr = new XDomainRequest();
-    xhr.open(method, url);
-
-  } else {
-
-    // Otherwise, CORS is not supported by the browser.
-    xhr = null;
-
-  }
-  return xhr;
-}
-
 // Returns a complied shader from a shader in the dom.
 // The id is the id of the script in the html tag.
 SimpleShader.prototype._loadAndCompileShader = function(filePath, shaderType) {
   var shaderText, shaderSource, compiledShader;
   var gl = gEngine.Core.getGL();
 
-  // // Step A: Get the shader source from index.html
-  // shaderText = document.getElementById(id);
-  // shaderSource = shaderText.firstChild.textContent;
-
-  // xmlReq = new XMLHttpRequest();
-  xmlReq = createCORSRequest('GET', filePath, false);
-  // xmlReq.open('GET', filePath, false);
+  xmlReq = new XMLHttpRequest();
+  xmlReq.open('GET', filePath, false);
   try {
     xmlReq.send();
   } catch (error) {
     alert("Failed to load shader: " + filePath);
     return null;
   }
-  shaderSource = xmlReq.responseText;
-  if (shaderSource === null) {
-    alert("WARNING: Loading of:" + filePath + "Failed!");
-  }
+    shaderSource = xmlReq.responseText;
+    console.log({shaderSource});
+    if (shaderSource === null) {
+      alert("WARNING: Loading of:" + filePath + "Failed!");
+    }
 
-  // Step B: Create the shader based on the shader type: vertex or fragment
-  compiledShader = gl.createShader(shaderType);
-  // Step C: Compile the created shader
-  gl.shaderSource(compiledShader, shaderSource);
-  gl.compileShader(compiledShader);
-  // Step D: check for errors and return results (null if error)
-  // The log info is how shader compilation errors are typically displayed.
-  // This is useful for debugging the shaders.
-  if (!gl.getShaderParameter(compiledShader, gl.COMPILE_STATUS)) {
-    alert("A shader compiling error occurred: " +
-      gl.getShaderInfoLog(compiledShader));
-  }
-  return compiledShader;
+    // Step B: Create the shader based on the shader type: vertex or fragment
+    compiledShader = gl.createShader(shaderType);
+    // Step C: Compile the created shader
+    gl.shaderSource(compiledShader, shaderSource);
+    gl.compileShader(compiledShader);
+    // Step D: check for errors and return results (null if error)
+    // The log info is how shader compilation errors are typically displayed.
+    // This is useful for debugging the shaders.
+    if (!gl.getShaderParameter(compiledShader, gl.COMPILE_STATUS)) {
+      alert("A shader compiling error occurred: " +
+        gl.getShaderInfoLog(compiledShader));
+    }
+    return compiledShader;
 };
 
 SimpleShader.prototype.activateShader = function() {
