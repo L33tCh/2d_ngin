@@ -4,8 +4,7 @@ function SimpleShader(vertexShaderID, fragmentShaderID) {
   // reference to the compiled shader in webgl context
   this.mShaderVertexPositionAttribute = null;
   // reference to SquareVertexPosition in shader
-  this.mPixelColor = null;
-  // reference to the pixelColor uniform in the fragment shader
+
   var gl = gEngine.Core.getGL();
 
   // start of constructor code
@@ -13,8 +12,8 @@ function SimpleShader(vertexShaderID, fragmentShaderID) {
   // Step A: load and compile vertex and fragment shaders
   var vertexShader = this._loadAndCompileShader(vertexShaderID, gl.VERTEX_SHADER);
   var fragmentShader = this._loadAndCompileShader(fragmentShaderID,
-    gl.FRAGMENT_SHADER);
-console.log({vertexShader, fragmentShader});
+      gl.FRAGMENT_SHADER);
+  console.log({vertexShader, fragmentShader});
   // Step B: Create and link the shaders into a program.
   this.mCompiledShader = gl.createProgram();
   gl.attachShader(this.mCompiledShader, vertexShader);
@@ -28,21 +27,19 @@ console.log({vertexShader, fragmentShader});
 
   // Step D: Gets a reference to the aSquareVertexPosition attribute
   this.mShaderVertexPositionAttribute = gl.getAttribLocation(this.mCompiledShader,
-    "aSquareVertexPosition");
+      "aSquareVertexPosition");
 
   // Step E: Activates the vertex buffer loaded in Engine.Core_VertexBuffer
   gl.bindBuffer(gl.ARRAY_BUFFER, gEngine.VertexBuffer.getGLVertexRef());
 
   /// Step F: Describe the characteristic of the vertex position attribute
   gl.vertexAttribPointer(this.mShaderVertexPositionAttribute,
-    3, // each element is a 3-float (x,y.z)
-    gl.FLOAT, // data type is FLOAT
-    false, // if the content is normalized vectors
-    0, // number of bytes to skip in between elements
-    0); // offsets to the first element
+      3, // each element is a 3-float (x,y.z)
+      gl.FLOAT, // data type is FLOAT
+      false, // if the content is normalized vectors
+      0, // number of bytes to skip in between elements
+      0); // offsets to the first element
 
-  // Step G: Gets a reference to the uniform variable uPixelColor in the //     fragment shader
-  this.mPixelColor = gl.getUniformLocation(this.mCompiledShader, "uPixelColor");
 }
 
 // Returns a complied shader from a shader in the dom.
@@ -59,32 +56,31 @@ SimpleShader.prototype._loadAndCompileShader = function(filePath, shaderType) {
     alert("Failed to load shader: " + filePath);
     return null;
   }
-    shaderSource = xmlReq.responseText;
-    console.log({shaderSource});
-    if (shaderSource === null) {
-      alert("WARNING: Loading of:" + filePath + "Failed!");
-    }
+  shaderSource = xmlReq.responseText;
+  console.log({shaderSource});
+  if (shaderSource === null) {
+    alert("WARNING: Loading of:" + filePath + "Failed!");
+  }
 
-    // Step B: Create the shader based on the shader type: vertex or fragment
-    compiledShader = gl.createShader(shaderType);
-    // Step C: Compile the created shader
-    gl.shaderSource(compiledShader, shaderSource);
-    gl.compileShader(compiledShader);
-    // Step D: check for errors and return results (null if error)
-    // The log info is how shader compilation errors are typically displayed.
-    // This is useful for debugging the shaders.
-    if (!gl.getShaderParameter(compiledShader, gl.COMPILE_STATUS)) {
-      alert("A shader compiling error occurred: " +
+  // Step B: Create the shader based on the shader type: vertex or fragment
+  compiledShader = gl.createShader(shaderType);
+  // Step C: Compile the created shader
+  gl.shaderSource(compiledShader, shaderSource);
+  gl.compileShader(compiledShader);
+  // Step D: check for errors and return results (null if error)
+  // The log info is how shader compilation errors are typically displayed.
+  // This is useful for debugging the shaders.
+  if (!gl.getShaderParameter(compiledShader, gl.COMPILE_STATUS)) {
+    alert("A shader compiling error occurred: " +
         gl.getShaderInfoLog(compiledShader));
-    }
-    return compiledShader;
+  }
+  return compiledShader;
 };
 
-SimpleShader.prototype.activateShader = function(pixelColor) {
+SimpleShader.prototype.activateShader = function() {
   var gl = gEngine.Core.getGL();
   gl.useProgram(this.mCompiledShader);
   gl.enableVertexAttribArray(this.mShaderVertexPositionAttribute);
-  gl.uniform4fv(this.mPixelColor, pixelColor);
 };
 
 SimpleShader.prototype.getShader = function() { return this.mCompiledShader; };
